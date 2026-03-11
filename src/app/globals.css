@@ -1,26 +1,181 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: 250 250 252;
+  --foreground: 15 23 42;
+  --card: 255 255 255;
+  --card-foreground: 15 23 42;
+  --primary: 99 102 241;
+  --primary-foreground: 255 255 255;
+  --secondary: 241 245 249;
+  --secondary-foreground: 51 65 85;
+  --muted: 241 245 249;
+  --muted-foreground: 100 116 139;
+  --accent: 241 245 249;
+  --accent-foreground: 51 65 85;
+  --destructive: 239 68 68;
+  --border: 226 232 240;
+  --ring: 99 102 241;
+  --radius: 0.75rem;
+  --sidebar-width: 280px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --background: 8 10 18;
+  --foreground: 226 232 240;
+  --card: 15 20 35;
+  --card-foreground: 226 232 240;
+  --primary: 129 140 248;
+  --primary-foreground: 15 23 42;
+  --secondary: 30 41 59;
+  --secondary-foreground: 203 213 225;
+  --muted: 30 41 59;
+  --muted-foreground: 148 163 184;
+  --accent: 30 41 59;
+  --accent-foreground: 203 213 225;
+  --destructive: 239 68 68;
+  --border: 30 41 59;
+  --ring: 129 140 248;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: rgb(var(--border));
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--muted-foreground) / 0.5);
+}
+
+/* Glass card effect */
+.glass {
+  background: rgb(var(--card) / 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgb(var(--border) / 0.5);
+}
+
+.dark .glass {
+  background: rgb(var(--card) / 0.5);
+  border: 1px solid rgb(var(--border) / 0.3);
+}
+
+/* Gradient backgrounds */
+.gradient-primary {
+  background: linear-gradient(135deg, rgb(99 102 241), rgb(168 85 247));
+}
+
+.gradient-success {
+  background: linear-gradient(135deg, rgb(16 185 129), rgb(34 197 94));
+}
+
+.gradient-warning {
+  background: linear-gradient(135deg, rgb(245 158 11), rgb(251 191 36));
+}
+
+.gradient-danger {
+  background: linear-gradient(135deg, rgb(239 68 68), rgb(244 63 94));
+}
+
+.gradient-info {
+  background: linear-gradient(135deg, rgb(59 130 246), rgb(99 102 241));
+}
+
+/* Shine animation */
+@keyframes shine {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shine {
+  background: linear-gradient(90deg, transparent 25%, rgb(255 255 255 / 0.1) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shine 2s infinite;
+}
+
+/* Pulse glow */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 15px rgb(99 102 241 / 0.3); }
+  50% { box-shadow: 0 0 25px rgb(99 102 241 / 0.6); }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Stat card hover */
+.stat-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.15);
+}
+
+.dark .stat-card:hover {
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.4);
+}
+
+/* Table row hover */
+.table-row {
+  transition: all 0.15s ease;
+}
+
+.table-row:hover {
+  background: rgb(var(--primary) / 0.05);
+}
+
+/* Responsive table cards on mobile */
+@media (max-width: 768px) {
+  .responsive-table thead {
+    display: none;
+  }
+  .responsive-table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border-radius: var(--radius);
+    padding: 1rem;
+    background: rgb(var(--card));
+    border: 1px solid rgb(var(--border));
+  }
+  .responsive-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border: none;
+  }
+  .responsive-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: rgb(var(--muted-foreground));
+  }
+}
+
+/* Leaflet map fixes */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius);
 }

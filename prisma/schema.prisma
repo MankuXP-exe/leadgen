@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Business {
+  id              String   @id @default(cuid())
+  name            String
+  category        String
+  address         String?
+  city            String?
+  area            String?
+  rating          Float?
+  reviewCount     Int?     @default(0)
+  phoneNumbers    String?  // Stored as "num1 / num2 / num3"
+  email           String?
+  websiteUrl      String?
+  googleMapsLink  String?
+  googlePlaceId   String?
+  openingHours    String?
+  priceLevel      String?
+  source          String?  // "google_maps / foursquare / justdial"
+  latitude        Float?
+  longitude       Float?
+  photoCount      Int?     @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  websiteAnalysis WebsiteAnalysis?
+  leadScore       LeadScore?
+  notes           Note[]
+  followUps       FollowUp[]
+
+  @@index([phoneNumbers])
+  @@index([name])
+  @@index([city])
+  @@index([websiteUrl])
+  @@index([googlePlaceId])
+  @@index([category])
+}
+
+model WebsiteAnalysis {
+  id              String   @id @default(cuid())
+  businessId      String   @unique
+  business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  httpStatus      Int?
+  isWorking       Boolean  @default(false)
+  loadSpeedMs     Int?
+  isMobileFriendly Boolean @default(false)
+  hasSSL          Boolean  @default(false)
+  lastUpdated     String?
+  isOutdated      Boolean  @default(false)
+  status          String   @default("NO_WEBSITE") // NO_WEBSITE | BROKEN | OUTDATED | GOOD | SLOW | NO_SSL
+  analyzedAt      DateTime @default(now())
+}
+
+model LeadScore {
+  id              String   @id @default(cuid())
+  businessId      String   @unique
+  business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  score           Int      @default(0)
+  classification  String   @default("LOW") // HOT | HIGH | MEDIUM | LOW
+  factors         String?  // JSON string of scoring factors
+  calculatedAt    DateTime @default(now())
+}
+
+model Note {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  content    String
+  createdAt  DateTime @default(now())
+}
+
+model FollowUp {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  date       DateTime
+  status     String   @default("PENDING") // PENDING | COMPLETED | CANCELLED
+  notes      String?
+  createdAt  DateTime @default(now())
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model SearchHistory {
+  id        String   @id @default(cuid())
+  location  String
+  category  String
+  provider  String?
+  resultCount Int    @default(0)
+  searchedAt DateTime @default(now())
+
+  @@index([location, category])
+}
+
+model ApiUsage {
+  id        String   @id @default(cuid())
+  provider  String
+  endpoint  String?
+  count     Int      @default(1)
+  month     String   // "2026-03" format
+  createdAt DateTime @default(now())
+
+  @@index([provider, month])
+}
